@@ -20,3 +20,52 @@ class Settings(BaseSettings):
 
 # Create a single, reusable instance of the settings
 settings = Settings()
+
+
+# app/config.py (add to the bottom)
+
+import logging
+import sys
+import structlog
+
+# --- LOGGING CONFIGURATION ---
+
+def configure_logging():
+    """
+    Configures structured logging for the entire application.
+    """
+    # Define the processing chain for log records.
+    shared_processors = [
+        structlog.contextvars.merge_contextvars,
+        structlog.stdlib.add_logger_name,
+        structlog.stdlib.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+    ]
+
+    # Configure structlog to wrap Python's standard logging.
+    structlog.configure(
+        processors=[
+            *shared_processors,
+            structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        ],
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        cache_logger_on_first_use=True,
+    )
+
+    # Define the formatter for the logs. We use JSON for production-readiness.
+    formatter = structlog.stdlib.ProcessorFormatter(
+        processor=structlog.processors.JSONRenderer(),
+        foreign_pre_chain=shared_processors,
+    )
+
+    # Create a handler to output logs to the console (stdout).
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(formatter)
+
+    # Get the root logger and add our configured handler.
+    root_logger = logging.getLogger()
+    root_logger.addHandler(handler)
+    root_logger.setLevel(logging.INFO)
+
+    print("Structured logging configured.")

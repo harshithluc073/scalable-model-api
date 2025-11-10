@@ -3,10 +3,11 @@
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from prometheus_fastapi_instrumentator import Instrumentator
+import structlog
 
 
 from .ml.model import PlaceholderModel, get_model
-from .config import settings
+from .config import settings, configure_logging
 
 # Create an instance of the FastAPI class
 app = FastAPI(
@@ -14,6 +15,9 @@ app = FastAPI(
     description=settings.API_DESCRIPTION,
     version=settings.API_VERSION,
 )
+
+configure_logging()
+log = structlog.get_logger(__name__)
 
 # --- Pydantic Models for Input and Output ---
 Instrumentator().instrument(app).expose(app)

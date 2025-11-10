@@ -1,5 +1,8 @@
 # app/ml/model.py
+import structlog
 from ..config import settings
+
+log = structlog.get_logger(__name__)
 
 class PlaceholderModel:
     """
@@ -10,7 +13,7 @@ class PlaceholderModel:
         # In a real scenario, you would load your model from a file here
         # For example: self.model = joblib.load("model.pkl")
         self.model_version = settings.MODEL_VERSION
-        print(f"Model version {self.model_version} loaded.")
+        log.info("Model loaded", version=self.model_version)
 
     def predict(self, text: str) -> dict:
         """

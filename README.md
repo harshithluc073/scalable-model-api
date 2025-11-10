@@ -34,7 +34,6 @@ Follow these instructions to get the entire application stack running on your lo
     git clone https://github.com/harshithluc073/scalable-model-api.git
     cd scalable-model-api
     ```
-    *(Replace `YOUR_USERNAME` with your actual GitHub username)*
 
 2.  **Launch the stack using Docker Compose:**
     ```bash

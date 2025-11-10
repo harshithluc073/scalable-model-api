@@ -2,6 +2,8 @@
 
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
+from prometheus_fastapi_instrumentator import Instrumentator
+
 
 from .ml.model import PlaceholderModel, get_model
 
@@ -13,6 +15,7 @@ app = FastAPI(
 )
 
 # --- Pydantic Models for Input and Output ---
+Instrumentator().instrument(app).expose(app)
 
 class PredictionRequest(BaseModel):
     text: str

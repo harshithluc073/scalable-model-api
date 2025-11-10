@@ -1,0 +1,12 @@
+# monitoring/prometheus.yml
+
+global:
+  scrape_interval: 15s # How frequently to scrape targets
+
+scrape_configs:
+  - job_name: 'fastapi-app'
+    static_configs:
+      # This is the target to scrape. 'api:8000' refers to the 'api' service
+      # defined in our docker-compose.yml, running on port 8000.
+      # Docker Compose's internal DNS makes this work.
+      - targets: ['api:8000']

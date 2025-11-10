@@ -1,4 +1,5 @@
 # app/ml/model.py
+from ..config import settings
 
 class PlaceholderModel:
     """
@@ -8,7 +9,7 @@ class PlaceholderModel:
     def __init__(self):
         # In a real scenario, you would load your model from a file here
         # For example: self.model = joblib.load("model.pkl")
-        self.model_version = "1.0.0-placeholder"
+        self.model_version = settings.MODEL_VERSION
         print(f"Model version {self.model_version} loaded.")
 
     def predict(self, text: str) -> dict:

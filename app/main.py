@@ -6,12 +6,13 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 
 from .ml.model import PlaceholderModel, get_model
+from .config import settings
 
 # Create an instance of the FastAPI class
 app = FastAPI(
-    title="Scalable Model Serving API",
-    description="A production-ready API for serving machine learning models.",
-    version="0.1.0",
+    title=settings.API_TITLE,
+    description=settings.API_DESCRIPTION,
+    version=settings.API_VERSION,
 )
 
 # --- Pydantic Models for Input and Output ---

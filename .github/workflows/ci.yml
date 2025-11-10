@@ -1,0 +1,38 @@
+# .github/workflows/ci.yml
+
+name: CI - Docker Build Validation
+
+# This workflow runs on pushes to the 'main' branch
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-validator:
+    # The job will run on the latest version of Ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository code, so the workflow can access it
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Docker Buildx, an advanced builder tool
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 3: Build the Docker image
+      # This step acts as a validation test. If the Dockerfile is broken
+      # or dependencies can't be installed, this step will fail,
+      # and the workflow will alert us to the problem.
+      - name: Build and validate Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          # We are only building for validation, not pushing to a registry yet
+          push: false
+          # Tag the image for reference in the logs
+          tags: scalable-model-api:ci-build

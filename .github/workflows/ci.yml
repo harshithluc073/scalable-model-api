@@ -1,6 +1,6 @@
 # .github/workflows/ci.yml
 
-name: CI - Docker Build Validation
+name: CI - Test and Validate Build
 
 # This workflow runs on pushes to the 'main' branch
 on:
@@ -10,29 +10,42 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-validator:
-    # The job will run on the latest version of Ubuntu
+  test-and-build:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository code, so the workflow can access it
+      # Step 1: Check out the repository code so the workflow can access it
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up Docker Buildx, an advanced builder tool
+      # Step 2: Set up a Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11' # Should match the version in your Dockerfile
+
+      # Step 3: Install dependencies, including testing libraries from requirements-dev.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      # Step 4: Run automated tests with pytest
+      # This is our quality gate. If this step fails, the workflow stops.
+      - name: Run automated tests
+        run: pytest
+
+      # --- If tests pass, the workflow continues to the build validation step ---
+
+      # Step 5: Set up Docker Buildx
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Step 3: Build the Docker image
-      # This step acts as a validation test. If the Dockerfile is broken
-      # or dependencies can't be installed, this step will fail,
-      # and the workflow will alert us to the problem.
+      # Step 6: Build the Docker image to validate it
       - name: Build and validate Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: ./Dockerfile
-          # We are only building for validation, not pushing to a registry yet
           push: false
-          # Tag the image for reference in the logs
           tags: scalable-model-api:ci-build

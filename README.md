@@ -2,7 +2,7 @@
 
 This project provides a production-ready blueprint for packaging a trained machine learning model into a high-performance, scalable, and monitored API.
 
-The system uses FastAPI for the API, Docker and Docker Compose for containerization, Prometheus for metrics collection, and Grafana for visualization. It also includes a CI pipeline with GitHub Actions to validate the Docker build on every push.
+The system uses FastAPI for the API, Docker and Docker Compose for containerization, Prometheus for metrics collection, and Grafana for visualization. It also includes a CI pipeline with GitHub Actions to validate the Docker build on every push and publish release images.
 
 ---
 
@@ -10,10 +10,13 @@ The system uses FastAPI for the API, Docker and Docker Compose for containerizat
 
 *   **FastAPI:** High-performance asynchronous API framework with automatic Swagger/OpenAPI documentation.
 *   **Docker & Docker Compose:** The entire application stack is containerized for portability and easy setup with a single command.
+*   **Automated Testing:** Unit tests are included and run with `pytest` to validate model behavior and API endpoints.
 *   **Live Monitoring:**
     *   **Prometheus:** Scrapes real-time performance metrics from the API (latency, request counts, etc.).
     *   **Grafana:** Provides a dashboard for visualizing API health and performance metrics.
-*   **CI/CD:** A GitHub Actions workflow automatically validates the Docker build on every push to the `main` branch.
+*   **CI/CD Pipeline:** A GitHub Actions workflow validates the code and Docker image; on merges to `main` it also builds and publishes the Docker image to the GitHub Container Registry (GHCR).
+*   **Externalized Configuration:** Runtime settings are managed via environment variables so you can tweak behavior without changing code.
+*   **Structured Logging:** Application logs are emitted in JSON format to make them easy to collect, parse, and analyze by logging systems.
 *   **Scalable Design:** The architecture is designed to be deployed and scaled in cloud environments.
 
 ---
@@ -35,7 +38,17 @@ Follow these instructions to get the entire application stack running on your lo
     cd scalable-model-api
     ```
 
-2.  **Launch the stack using Docker Compose:**
+2.  **Configure the Environment (Optional):**
+
+    If you'd like to customize the project locally, copy the example environment file and edit it:
+
+    ```bash
+    copy .env.example .env
+    ```
+
+    Then edit the newly created `.env` file to change settings such as the API title, ports, or other runtime values for your local setup. These values are loaded via environment variables when the application and compose stack start.
+
+3.  **Launch the stack using Docker Compose:**
     ```bash
     docker-compose up --build
     ```
@@ -58,6 +71,58 @@ Once the stack is running, the following endpoints are available:
 *   **Grafana Dashboard:**
     *   **URL:** `http://localhost:3000`
     *   This is where you can build and view dashboards to monitor the API's performance.
+
+---
+
+## Development Guide
+
+### Setting Up a Local Virtual Environment
+
+1. Create a virtual environment and activate it:
+
+     - On Windows (PowerShell):
+
+         ```powershell
+         python -m venv .venv
+         .\.venv\Scripts\Activate.ps1
+         ```
+
+     - On macOS / Linux:
+
+         ```bash
+         python3 -m venv .venv
+         source .venv/bin/activate
+         ```
+
+2. Install development dependencies:
+
+        ```bash
+        pip install -r requirements-dev.txt
+        ```
+
+### Running Tests
+
+Run the automated test suite with pytest:
+
+```bash
+pytest
+```
+
+This runs unit tests located in the `tests/` folder and helps validate the API behavior and model code during development.
+
+---
+
+## CI/CD Pipeline
+
+The repository contains a GitHub Actions workflow that automates testing, image build, and publishing. The workflow definition lives at `.github/workflows/ci.yml`.
+
+Pipeline stages:
+
+- **Test:** Runs the `pytest` suite to validate code and catch regressions.
+- **Build:** Builds the Docker image for the FastAPI service.
+- **Push:** When changes are merged to the `main` branch, the pipeline pushes the built image to the GitHub Container Registry (GHCR) so releases and images are available to downstream deployments.
+
+Published images can be found in the "Packages" section of this repository's GitHub page.
 
 ---
 

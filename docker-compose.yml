@@ -1,0 +1,19 @@
+# docker-compose.yml
+
+version: '3.8'
+
+services:
+  # Define our main API service
+  api:
+    # Give the container a friendly name
+    container_name: scalable-model-api-container
+    # Tell Docker Compose to build the image from the Dockerfile in the current directory
+    build: .
+    # Define the port mapping, same as the -p flag in docker run
+    ports:
+      - "8000:8000"
+    # Set environment variables if needed (we'll use this later)
+    environment:
+      - ENVIRONMENT=development
+    # Define restart policy
+    restart: unless-stopped

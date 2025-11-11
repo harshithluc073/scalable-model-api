@@ -96,9 +96,8 @@ Once the stack is running, the following endpoints are available:
 
 2. Install development dependencies:
 
-        ```bash
         pip install -r requirements-dev.txt
-        ```
+        
 
 ### Running Tests
 
